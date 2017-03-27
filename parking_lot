@@ -1,0 +1,7 @@
+mvn clean install
+if [ $# -gt 0 ]
+then
+	mvn exec:java -pl go-jek-assignment -Dexec.mainClass=com.prateek.go_jek_assignment.Executor -Dexec.args=$1 
+else
+	mvn exec:java -pl go-jek-assignment -Dexec.mainClass=com.prateek.go_jek_assignment.Executor
+fi
