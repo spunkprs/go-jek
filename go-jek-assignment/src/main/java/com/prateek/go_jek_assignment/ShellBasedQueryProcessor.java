@@ -24,10 +24,4 @@ public class ShellBasedQueryProcessor extends QueryProcessor {
 		}
 	}
 	
-	/*
-	public static void main(String ar[]) {
-		ShellBasedQueryProcessor queryProcessor = new ShellBasedQueryProcessor(new QueryDelegator(new ShellBasedOutputWriter()));
-		queryProcessor.processQueries();
-	}
-	*/
 }

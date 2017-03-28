@@ -30,10 +30,4 @@ public class FileBasedQueryProcessor extends QueryProcessor {
 		} 
 	}
 	
-	/*
-	public static void main(String ar[]) {
-		FileBasedQueryProcessor queryProcessor = new FileBasedQueryProcessor("file_inputs.txt", new QueryDelegator(new ShellBasedOutputWriter()));
-		queryProcessor.processQueries();
-	}
-	*/
 }

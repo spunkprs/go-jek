@@ -15,6 +15,7 @@ public class QueryDelegator {
 	private ParkingDataProcessor parkingDataProcessor;
 	private ParkingEntryAndExitProcessor parkingEntryAndExitProcessor;
 	private OutputWriter outputWriter;
+	private String PARKING_LOT_NOT_CREATED = "Parking lot not created";
 
 	public QueryDelegator(OutputWriter outputWriter) {
 		this.outputWriter = outputWriter;
@@ -28,6 +29,7 @@ public class QueryDelegator {
 			st = query.split(" ");
 			if (parkingDataProcessor == null) {
 				parkingDataProcessor = new ParkingDataProcessorImpl(Integer.parseInt(st[1]));
+				parkingEntryAndExitProcessor = new ParkingEntryAndExitProcessorImpl(parkingDataProcessor);
 			}
 			output = "Created a parking lot with" + " " + st[1] + " "+ "slots";
 			writeOutput(output);
@@ -35,56 +37,83 @@ public class QueryDelegator {
 			st = query.split(" ");
 			String vehicleRegistrationNumber = st[1];
 			String vehicleColour = st[2];
-			
-			if (parkingEntryAndExitProcessor == null) {
-				parkingEntryAndExitProcessor = new ParkingEntryAndExitProcessorImpl(parkingDataProcessor);
+			if (isParkingLotCreated()) {
+				output = parkingEntryAndExitProcessor.parkingEntryProcess(vehicleRegistrationNumber, vehicleColour);
+			} else {
+				output = PARKING_LOT_NOT_CREATED;
 			}
-			output = parkingEntryAndExitProcessor.parkingEntryProcess(vehicleRegistrationNumber, vehicleColour);
 			writeOutput(output);
 		} else if (query.contains(Queries.LEAVE.getQuery())) {
 			st = query.split(" ");
 			int slotNumber = Integer.parseInt(st[1]);
-			output = parkingEntryAndExitProcessor.parkingExitProcess(slotNumber);
+			if (isParkingLotCreated()) {
+				output = parkingEntryAndExitProcessor.parkingExitProcess(slotNumber);
+			} else {
+				output = PARKING_LOT_NOT_CREATED;
+			}
 			writeOutput(output);
 		} else if (query.equalsIgnoreCase(Queries.STATUS.getQuery())) {
-			Ticket tickets[] = parkingDataProcessor.fetchCurrentStatus();
-			if (tickets.length > 0) {
-				output = OutputGenerator.generateStatus(tickets);
+			if (isParkingLotCreated()) {
+				Ticket tickets[] = parkingDataProcessor.fetchCurrentStatus();
+				if (tickets.length > 0) {
+					output = OutputGenerator.generateStatus(tickets);
+				} else {
+					output = "No status for empty parking";
+				}
 			} else {
-				output = "No status for empty parking";
+				output = PARKING_LOT_NOT_CREATED;
 			}
 			writeOutput(output);
 		} else if (query.contains(Queries.REGISTRATION_NUMBERS_FOR_CARS_WITH_COLOUR.getQuery())) {
 			st = query.split(" ");
 			String color = st[1];
-			List<String> registrationNumbers = parkingDataProcessor.fetchRegistrationNumbersForCarsWithColor(color);
-			if (!registrationNumbers.isEmpty()) {
-				output = OutputGenerator.generateOutputForRegistrationNumbers(registrationNumbers);
+			if (isParkingLotCreated()) {
+				List<String> registrationNumbers = parkingDataProcessor.fetchRegistrationNumbersForCarsWithColor(color);
+				if (!registrationNumbers.isEmpty()) {
+					output = OutputGenerator.generateOutputForRegistrationNumbers(registrationNumbers);
+				} else {
+					output = "No vehicles of color" + " " + color;
+				}
 			} else {
-				output = "No vehicles of color" + " " + color;
+				output = PARKING_LOT_NOT_CREATED;
 			}
 			writeOutput(output);
 		} else if (query.contains(Queries.SLOT_NUMBERS_FOR_CARS_WITH_COLOUR.getQuery())) {
 			st = query.split(" ");
 			String color = st[1];
-			List<Integer> slotNumbers = parkingDataProcessor.fetchSlotNumbersForCarsWithColor(color);
-			if (!slotNumbers.isEmpty()) {
-				output = OutputGenerator.generateOutputForSlotNumbers(slotNumbers);
+			if (isParkingLotCreated()) {
+				List<Integer> slotNumbers = parkingDataProcessor.fetchSlotNumbersForCarsWithColor(color);
+				if (!slotNumbers.isEmpty()) {
+					output = OutputGenerator.generateOutputForSlotNumbers(slotNumbers);
+				} else {
+					output = "No vehicles of color" + " " + color;
+				}
 			} else {
-				output = "No vehicles of color" + " " + color;
+				output = PARKING_LOT_NOT_CREATED;
 			}
 			writeOutput(output);
 		} else if (query.contains(Queries.SLOT_NUMBER_FOR_REGISTRATION_NUMBER.getQuery())) {
 			st = query.split(" ");
 			String registrationNumber = st[1];
-			int slotNumber = parkingDataProcessor.fetchSlotNumberForRegistrationNumber(registrationNumber);
-			if (slotNumber != -1) {
-				output = String.valueOf(slotNumber);
+			if (isParkingLotCreated()) {
+				int slotNumber = parkingDataProcessor.fetchSlotNumberForRegistrationNumber(registrationNumber);
+				if (slotNumber != -1) {
+					output = String.valueOf(slotNumber);
+				} else {
+					output = "Not found";
+				}
 			} else {
-				output = "Not found";
+				output = PARKING_LOT_NOT_CREATED;
 			}
 			writeOutput(output);
 		}
+	}
+	
+	private boolean isParkingLotCreated() {
+		if (parkingDataProcessor == null || parkingEntryAndExitProcessor == null) {
+			return false;
+		}
+		return true;
 	}
 	
 	private void writeOutput(String output) {

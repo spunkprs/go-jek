@@ -267,7 +267,7 @@ public class ParkingDataProcessorImplTest {
 		
 		slots[0] = t1;
 		slots[1] = t2;
-		slots[2] = t3;
+		slots[2] = null;
 		slots[3] = t4;
 		updateMaps(slots);
 		
@@ -287,10 +287,13 @@ public class ParkingDataProcessorImplTest {
 	}
 
 	private Ticket[] createReplica(Ticket[] slots) {
-		Ticket[] replicaSlots = new Ticket[slots.length];
+		List<Ticket> replicaSlots = new ArrayList<Ticket>();
 		for (int i = 0; i < slots.length; i++) {
-			replicaSlots[i] = new Ticket(slots[i].getRegistrationNumber(), slots[i].getVehicleColour(), slots[i].getSlotNumber());
+			if (slots[i] != null) {
+				replicaSlots.add(new Ticket(slots[i].getRegistrationNumber(), slots[i].getVehicleColour(), slots[i].getSlotNumber()));
+			}
 		}
-		return replicaSlots;
+		int size = replicaSlots.size();
+		return replicaSlots.toArray(new Ticket[size]);
 	}
 }

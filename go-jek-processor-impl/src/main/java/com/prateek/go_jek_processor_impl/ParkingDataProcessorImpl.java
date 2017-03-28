@@ -112,7 +112,14 @@ public class ParkingDataProcessorImpl implements ParkingDataProcessor {
 	}
 
 	public Ticket[] fetchCurrentStatus() {
-		return slots;
+		List<Ticket> availableSlots = new ArrayList<Ticket>();
+		for (int i = 0; i < this.slots.length; i++) {
+			if (this.slots[i] != null) {
+				availableSlots.add(this.slots[i]);
+			}
+		}
+		int size = availableSlots.size();
+		return availableSlots.toArray(new Ticket[size]);
 	}
 
 	public List<String> fetchRegistrationNumbersForCarsWithColor(String vehicleColor) {
